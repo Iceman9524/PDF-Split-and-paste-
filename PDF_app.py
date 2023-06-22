@@ -5,7 +5,7 @@ from pdf_split import *
 
 class canvas_pdf:
     title = "PDF Splitter"
-    geometry = (500,500)
+    geometry = (600,500)
     background = "#202020"
     background_frame = "#ffffff"
     buttons_color = "#f2f2f2"
@@ -20,29 +20,43 @@ class canvas_pdf:
         self.split_widgets = {}
         self.next_id = 0
     def home(self):
+         try:
+              self.Scanvas.destroy()
+              self.Label_pdfs()
+         except:
+              pass
          self.Hcanvas = Canvas(self.window, bg= self.background, height = self.geometry[0], width=self.geometry[1],highlightthickness=0)
          self.frame_1 = Frame(self.Hcanvas, bg=self.background_frame)
          self.frame_1.pack()
          self.frame_2 = Frame(self.Hcanvas, bg=self.background_frame)
+         button = Button(self.frame_2, text="Browse trough files", bg=self.buttons_color, height=2, width=20,command=self.openFexplorer,font=("Arial", 15))
+         button.pack()
          self.frame_2.pack()
          self.Hcanvas.pack()
+
     def split_canvas(self):
          self.Scanvas = Canvas(self.window,  bg= self.background, height = self.geometry[0], width=self.geometry[1],highlightthickness=0)
          self.Scanvas.pack()
-         text_label = Label(self.Scanvas, text="Would you like to split:\n {}?\nIf so please enter the page number.\nYour PDF will split after the given page number.".format(self.filenames[self.split_widgets[self.fbutton]]),
+         text_label = Label(self.Scanvas, text="Would you like to split:\n {}?\nIf so please enter the page number.\nYour PDF will split after the given page number.".format(self.filenames[self.split_widgets[self.sbutton]]),
                              font=("Arial", 15), fg="#ffffff", bg=self.background)
          text_label.pack()
-         self.number_entry = Entry(self.Scanvas, width= 40, font=("Arial", 15))
+         entry_frame = Frame(self.Scanvas)
+         self.number_entry = Entry(entry_frame, width= 40, font=("Arial", 15))
          self.number_entry.insert(0, "Please enter a page number here.")
          self.number_entry.pack(pady = 5, ipady= 10)
-         self.name_entry = Entry(self.Scanvas, width= 40, font=("Arial", 15))
+         self.name_entry = Entry(entry_frame, width= 40, font=("Arial", 15))
          self.name_entry.insert(0, "Please enter the new filename for the first file.")
          self.name_entry.pack(pady = 5, ipady= 10)
-         self.name_entry_2 = Entry(self.Scanvas, width= 40, font=("Arial", 15))
+         self.name_entry_2 = Entry(entry_frame, width= 40, font=("Arial", 15))
          self.name_entry_2.insert(0, "Please enter the new filename for the second file.")
          self.name_entry_2.pack(pady = 5, ipady= 10)
-         split_pdf_button = Button(self.Scanvas, text="Split PDF",font=("Arial", 15), command=self.split_pdf )
+         entry_frame.pack()
+         buttons_frame = Frame(self.Scanvas)
+         split_pdf_button = Button(buttons_frame, text="Split PDF",font=("Arial", 15), command=self.split_pdf )
          split_pdf_button.pack()
+         return_button = Button(buttons_frame, text="return to home page", font=("Arial", 15), command=self.home)
+         return_button.pack()
+         buttons_frame.pack()
     def split_pdf(self):
          i = 3
          try:
@@ -94,9 +108,12 @@ class canvas_pdf:
                 label_frame = Frame(self.frame_1)
                 flabel = Label(label_frame, text=filename, bg="#ffffff", font=("Arial", 15))
                 flabel.pack(side=LEFT, padx=(0, 25))
-                self.fbutton = Button(label_frame, text="split", bg="#ffffff", font=("Arial", 15), command=self.split_button)
-                self.fbutton.pack(side=LEFT)
-                self.split_widgets[self.fbutton] = self.next_id
+                self.sbutton = Button(label_frame, text="split", bg="#ffffff", font=("Arial", 15), command=self.split_button)
+                self.sbutton.pack(side=LEFT)
+                self.split_widgets[self.sbutton] = self.next_id
+                self.pbutton = Button(label_frame, text="paste", bg="#ffffff", font=("Arial", 15))
+                self.pbutton.pack(side=LEFT, padx = (5,0))
+                self.split_widgets[self.pbutton] = self.next_id
                 self.next_id += 1
                 label_frame.pack()
             
@@ -106,15 +123,9 @@ class canvas_pdf:
         self.files.append(f_path[0])
         self.file = f_path[0]
         self.Label_pdfs()
-     
-    def file_button(self):
-        button = Button(self.frame_2, text="Browse trough files", bg=self.buttons_color, height=2, width=20,command=self.openFexplorer,font=("Arial", 15))
-        button.pack()
-
 
     def run(self):
         self.home()
-        self.file_button()
         self.window.mainloop()
 
 
