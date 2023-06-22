@@ -34,6 +34,11 @@ class canvas_pdf:
          self.frame_2.pack()
          self.Hcanvas.pack()
 
+    def restore_home(self):
+         self.home()
+         for i in self.files:
+              self.Label_pdfs(i)
+              
     def split_canvas(self):
          self.Scanvas = Canvas(self.window,  bg= self.background, height = self.geometry[0], width=self.geometry[1],highlightthickness=0)
          self.Scanvas.pack()
@@ -54,7 +59,7 @@ class canvas_pdf:
          buttons_frame = Frame(self.Scanvas)
          split_pdf_button = Button(buttons_frame, text="Split PDF",font=("Arial", 15), command=self.split_pdf )
          split_pdf_button.pack()
-         return_button = Button(buttons_frame, text="return to home page", font=("Arial", 15), command=self.home)
+         return_button = Button(buttons_frame, text="return to home page", font=("Arial", 15), command=self.restore_home)
          return_button.pack()
          buttons_frame.pack()
     def split_pdf(self):
@@ -101,9 +106,9 @@ class canvas_pdf:
          self.Hcanvas.destroy()
          self.split_canvas()     
     
-    def Label_pdfs(self):
-                temp = self.file.rfind("/")
-                filename = self.file[temp+1:]
+    def Label_pdfs(self, file):
+                temp = file.rfind("/")
+                filename = file[temp+1:]
                 self.filenames.append(filename)
                 label_frame = Frame(self.frame_1)
                 flabel = Label(label_frame, text=filename, bg="#ffffff", font=("Arial", 15))
@@ -121,8 +126,8 @@ class canvas_pdf:
         ftypes = [('PDF files', '*.pdf'), ('All files', '*')]
         f_path = filedialog.askopenfilenames(filetypes=ftypes)
         self.files.append(f_path[0])
-        self.file = f_path[0]
-        self.Label_pdfs()
+        file = f_path[0]
+        self.Label_pdfs(file)
 
     def run(self):
         self.home()
