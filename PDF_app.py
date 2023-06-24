@@ -31,13 +31,7 @@ class canvas_pdf:
          self.frame_2 = Frame(self.Hcanvas, bg=self.background)
          button = Button(self.frame_2, text="Browse trough files", height=2, width=20,command=self.openFexplorer,font=("Arial", 15), bg=self.background_frame, fg=self.text_color)
          button.pack()
-         """""
-         if self.next_id >= 2:
-              status = NORMAL
-         else:
-              status = DISABLED
-          """""
-         self.H_paste = Button(self.frame_2, text="Merge files together", height=2, width=20,command=self.openFexplorer,font=("Arial", 15), bg=self.background_frame, fg=self.text_color, state=DISABLED)
+         self.H_paste = Button(self.frame_2, text="Merge files together", height=2, width=20,command=self.paste_button,font=("Arial", 15), bg=self.background_frame, fg=self.text_color, state=DISABLED)
          self.H_paste.pack(pady=(10,0))
          self.frame_2.pack()
          self.Hcanvas.pack()
@@ -46,6 +40,7 @@ class canvas_pdf:
          self.Scanvas.destroy()
          self.home()
          for i in self.files:
+              self.next_id -= 1
               self.Label_pdfs(i)
               
     def split_canvas(self):
@@ -93,22 +88,16 @@ class canvas_pdf:
               self.Error = Label(self.Error_frame, text="Please enter a number before clicking.", font=("Arial", 15), bg=self.background, fg=self.error_color)
               self.Error.pack()
               i -= 1
-         
-         
-                   
          new_name_1 = self.name_entry.get()
          if new_name_1 == "Please enter the new filename for the first file.":
               self.Error = Label(self.Error_frame, text="Please enter a new first filename before clicking.", font=("Arial", 15), bg=self.background, fg=self.error_color)
               self.Error.pack()
               i -= 1
-              
          new_name_2 = self.name_entry_2.get()
          if new_name_2 == "Please enter the new filename for the second file.":
                self.Error = Label(self.Error_frame, text="Please enter a new second filename before clicking.", font=("Arial", 15), bg=self.background, fg=self.error_color)
                self.Error.pack()
                i -= 1
-       
-         
          if i == 4:
               try:
                    split_pdf((0,page_num), file_path, new_name_1)
@@ -119,25 +108,49 @@ class canvas_pdf:
               except:
                    self.Error = Label(self.Error_frame, text="Something went wrong check.", font=("Arial", 15), bg=self.background, fg=self.error_color)
                    self.Error.pack()
+    
     def split_button(self):
          self.Hcanvas.destroy()
          self.split_canvas()     
-      
-    def Label_pdfs(self, file):
+    
+    def paste_button(self):
+         self.Hcanvas.destroy() 
+         self.paste_canvas()
+     
+    def paste_canvas(self):
+         self.Scanvas = Canvas(self.window,  bg= self.background, height = self.geometry[0], width=self.geometry[1],highlightthickness=0)
+         self.Scanvas.pack()
+         text_label = Label(self.Scanvas, text="Would you like to paste two files together?\n If so please select two files and select your desired order.",
+                             font=("Arial", 15), fg=self.text_color, bg=self.background)
+         text_label.pack()
+         self.frame_1 = Frame(self.Scanvas, bg=self.background)
+         self.frame_1.pack(pady=10)
+         for i in self.files:
+                self.Label_pdfs(i, False)
+    
+    def Label_pdfs(self, file, bool=True):
                 temp = file.rfind("/")
                 filename = file[temp+1:]
                 self.filenames.append(filename)
                 label_frame = Frame(self.frame_1, bg=self.background_frame)
                 flabel = Label(label_frame, text=filename, bg=self.background_frame, fg=self.text_color, font=("Arial", 15))
                 flabel.pack(side=LEFT, padx=(0, 25))
-                self.sbutton = Button(label_frame, text="split", bg=self.background_frame, font=("Arial", 15), command=self.split_button, fg=self.text_color)
-                self.sbutton.pack(side=LEFT)
-                self.split_widgets[self.sbutton] = self.next_id
-                self.next_id += 1
-                if self.next_id >= 2:
-                    self.H_paste.config(state=NORMAL)
-                label_frame.pack(pady=(0,10))
-                
+                if bool == True:
+                    self.sbutton = Button(label_frame, text="split", bg=self.background_frame, font=("Arial", 15), command=self.split_button, fg=self.text_color)
+                    self.sbutton.pack(side=LEFT)
+                    self.split_widgets[self.sbutton] = self.next_id
+                    self.next_id += 1
+                    if self.next_id >= 2:
+                         self.H_paste.config(state=NORMAL)
+                         
+                else:
+                      var = StringVar()  # Variable to store the checkbox state
+                      self.sbutton = Radiobutton(label_frame, text="select", bg=self.background_frame, font=("Arial", 15),
+                                   fg=self.text_color, variable=var, value=file, state=ACTIVE)
+                      self.sbutton.pack(side=LEFT)
+                      self.split_widgets[self.sbutton] = self.next_id
+                      self.next_id += 1
+                label_frame.pack(pady=(0,10))    
     def openFexplorer(self):
         ftypes = [('PDF files', '*.pdf'), ('All files', '*')]
         f_path = filedialog.askopenfilenames(filetypes=ftypes)
